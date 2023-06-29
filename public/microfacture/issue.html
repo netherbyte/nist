@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Issue ${issue.number} | Microfacture</title>
+</head>
+
+<body>
+	<div class="container">
+		<div class="header">${mfIH}</div>
+		<div class="body">
+			<!--
+				super cool chat v1.0
+				
+
+				
+			-->
+			<h1 class="issueName"><span class="light-text">${issue.number}</span> ${issue.name}</h1>
+			<h2>Status: ${issue.status}${issue.statusIndicator}</h2>
+			<p class="description">${issue.description}</p>
+			<strong>
+				<p>Versions affected:</p>
+			</strong>
+			<ul>
+				${issue.versionsLI}
+			</ul>
+			<div class="meta">
+				<p>Created on: ${issue.createdOn}</p>
+				<p>Last updated: ${issue.lastUpdate}</p>
+				<p>Reporter: ${issue.reporter}</p>
+				<p>Assignees:</p>
+				<ul>${issue.assigneesLI}</ul>
+			</div>
+		</div>
+		<div class="footer">
+			<footer>
+				${mfIF}<br>
+				${commonFooter}
+			</footer>
+		</div>
+	</div>
+</body>
+
+</html>
