@@ -1,3 +1,4 @@
+${isumpage "microfacture"}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,7 +16,14 @@
 		<div class="body">
 			<h2>Open Issues</h2>
 			<ul class="issues">
-				${microfacture_issuecLI_open}
+				<table>
+					<tr>
+						<th>ID</th>
+						<th>Name</th>
+						<th>Status</th>
+					</tr>
+					${microfacture_issuecTR}
+				</table>
 			</ul>
 		</div>
 		<div class="footer">

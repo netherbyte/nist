@@ -1,5 +1,6 @@
 package com.netherbyte.nist;
 
+import haxe.ds.ArraySort;
 import haxe.Log;
 import haxe.Json;
 import sys.io.File;
@@ -112,11 +113,11 @@ class Server {
 
 						irk.push("issue.statusIndicator");
 						switch (issue.status) {
-							case "Open": irv.push("🟢");
-							case "Acknowledged": irv.push("🟡");
-							case "In Progress": irv.push("🟠");
-							case "Closed": irv.push("🔴");
-							case "Fixed": irv.push("⚪️");
+							case "Open": irv.push("🔴");
+							case "Acknowledged": irv.push("🟠");
+							case "In Progress": irv.push("🟡");
+							case "Closed": irv.push("⚪️");
+							case "Fixed": irv.push("🟢");
 						}
 
 						var ir = replaced;
@@ -130,6 +131,37 @@ class Server {
 						req.replyData(ir, "text/html", 200);
 				}
 			} else {
+				if (content.contains("${isumpage")) {
+					var isumpageln = content.split("\n")[0];
+					var isumpage = isumpageln.substring(12, isumpageln.length - 3).toLowerCase();
+
+					trace(isumpage);
+
+					var repl = "";
+					var keys = "${" + isumpage + "_issuecTR}";
+
+					var issues = Database.getIssues(isumpage);
+					for (i in (issues.length - 1)...0) {
+						var issue = issues[i];
+						repl = repl
+							+ "
+						<tr>
+						<td>"
+							+ issue.number
+							+ "</td>
+						<td>"
+							+ issue.name
+							+ "</td>
+							<td>"
+							+ issue.status
+							+ "</td>
+						";
+					}
+
+					trace(repl);
+
+					replaced = replaced.replace(keys, repl);
+				}
 				req.replyData(replaced, "text/html", 200);
 			}
 		} else if (FileSystem.exists(Path.join([Sys.getCwd(), "/public/404.html"]))) {
