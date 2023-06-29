@@ -1,0 +1,95 @@
+import http.server as s
+import sys
+import os
+
+prod_port_1 = 443
+prod_port_2 = 80
+dev_port_1 = 3000
+dev_port_2 = 3001
+
+replacements = {"domain": "localhost:3000"}
+
+index_path = "./public/index.html"
+
+# foo.bar -> public/index.html
+# foo.bar/index.html -> public/index.html
+# foo.bar/projects -> public/projects/index.html
+# foo.bar/projects/microfacture.html -> public/projects/microfacture.html
+# foo.bar/projects/microfacture.html?issue=319 -> (db path)/microfacture/319.json (rendered on public/projects/microfacture/issue.html)
+
+class Server(s.BaseHTTPRequestHandler):
+    def do_GET(self):
+        def send_header(code=200, type="text/html"):
+            self.send_response(code)
+            self.send_header("Content-type", type)
+            self.end_headers()
+        def error404():
+            os.system("cd " + os.path.dirname(__file__))
+            if os.path.exists(os.path.realpath("./public/404.html")):
+                with open(os.path.realpath("./public/404.html")) as f:
+                    send_header(code=404)
+                    file = f.read()
+                    for r in replacements:
+                        file.replace("${" + r + "}", replacements[r])
+                    self.wfile.write(bytes(file.encode()))
+            else:
+                send_header(code=404, type="text/plain")
+                self.wfile.write(bytes("404 = 400 + 4 = 100 + 100 + 100 + 100 + 1 + 1 + 1 + 1 = 100 * 4 + 1 * 4".encode()))
+        #if self.path in ["/", "/index.htm", "/index.html"]:
+        #    os.system(f"cd {os.path.dirname(__file__)}")
+        #    if os.path.exists(os.path.realpath(index_path)):
+        #        with open(os.path.realpath(index_path)) as f:
+        #            send_header()
+        #            file = f.read()
+        #            for r in replacements:
+        #                file.replace("${" + r + "}", replacements[r])
+        #            self.wfile.write(bytes(file.encode()))
+        #    else:
+        #        error404()
+        os.system(f"cd {os.path.dirname(__file__)}")
+        path = ""
+        print(self.path)
+        if len(self.path.split("?")) > 1:
+            with self.path.split("?") as c:
+                if c[-2].endswith(".html"):
+                    path = self.path + "l"
+        # chunks = path.split("/")
+        # if len(chunks[len(chunks)-1].split("?")) > 1:
+        #     chunks.pop(1)
+        #     for chunk in chunks:
+        #         path = path + "/" + chunk
+        #     path = path + "/" + chunks[len(chunks)-1].split("?")[0]
+        #     path = path + "?" + chunks[len(chunks)-1].split("?")[1]
+        #     path.removeprefix("/")
+        # else:
+        #     path = self.path
+        print(os.path.realpath("./public/" + path))
+        with open(os.path.realpath("./public/" + path)) as f:
+            try:
+                file = f.read()
+                send_header()
+                self.wfile.write(bytes(file.encode()))
+            except:
+                error404()
+        #else:
+        #    error404()
+
+try:
+    if sys.argv[1] in ["--dev", "-d"]:
+        port = dev_port_1
+    dev_enabled = True
+except:
+    port = prod_port_1
+
+try:
+    server = s.HTTPServer(("localhost", port), Server)
+    print("The sertver is online on port " + str(port))
+    server.serve_forever()
+except ConnectionRefusedError:
+    if dev_enabled:
+        port = dev_port_2
+    else:
+        port = prod_port_2
+    server = s.HTTPServer(("localhost", port), Server)
+    print("The sertver is online on port " + str(port))
+    server.serve_forever()

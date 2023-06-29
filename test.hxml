@@ -1,0 +1,7 @@
+--library hx_webserver
+--library crypto
+--class-path src
+--main com.netherbyte.nist.Main
+--cpp bin
+
+--cmd .\bin\Main.exe --dev
