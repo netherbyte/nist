@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Create New Issue</title>
+</head>
+<body>
+	<div class="container">
+		<div class="header">${mfIH}</div>
+		<div class="body">
+			<h1>Submit a new issue for Microfacture</h1>
+			<form action="../issue.hx" method="post">
+				<label for="name">Name</label>
+                <input type="text" name="name" id="name">
+                <br>
+                <label for="desc">Description</label>
+                <input type="text" name="desc" id="desc">
+                <br>
+                <p>Versions Affected</p>
+                <label for="1">a1.0.0</label>
+                <input type="checkbox" name="1" id="1">
+                <br>
+                <label for="2">a1.1.0</label>
+                <input type="checkbox" name="2" id="2">
+				<br><button type="submit" value="Submit">Submit</button>
+            </form>
+		</div>
+		<div class="footer">
+			${mfIF}<br>
+			${commonFooter}
+		</div>
+	</div>
+</body>
+</html>

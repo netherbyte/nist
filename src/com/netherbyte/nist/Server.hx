@@ -35,10 +35,44 @@ class Server {
 	public static function handleRequest(req:HTTPRequest) {
 		var path = req.methods[1].substring(1).split("?")[0];
 		var params = req.methods[1].substring(1).split("?")[1].split("&");
-		if (!path.endsWith(".html")) {
+		if (!path.contains(".")) {
 			path = path + "/index.html";
 		}
 		var fspath = Path.join([Sys.getCwd(), "/public/" + path]);
+
+		if (path == "issue.hx") {
+			var data = req.postData.split("&");
+
+			var issue:Issue = {
+				number: "",
+				assignees: [],
+				reporter: "",
+				status: "Open",
+				versionsAffected: [],
+				updates: [[]],
+				createdOn: Math.round(Date.now().getTime()),
+				description: "",
+				name: ""
+			};
+
+			for (d in data) {
+				var kv = d.split("=");
+				switch(kv[0]) {
+					case "name":
+						issue.name = kv[1];
+					case "desc":
+						issue.description = kv[1];
+					case "1":
+						issue.versionsAffected.push("a1.0.0");
+					case "2":
+						issue.versionsAffected.push("a1.1.0");
+				}
+			}
+
+			Database.addIssue(issue);
+
+			req.close();
+		}
 
 		if (FileSystem.exists(fspath) && !FileSystem.isDirectory(fspath)) {
 			var content = File.getContent(fspath);
@@ -141,10 +175,10 @@ class Server {
 					var keys = "${" + isumpage + "_issuecTR}";
 
 					var issues = Database.getIssues(isumpage);
-					for (i in (issues.length - 1)...0) {
+					issues.sort((a, b) -> Std.parseInt(a.number.substring(3)) - Std.parseInt(b.number.substring(3)));
+					for (i in 0...(issues.length)) {
 						var issue = issues[i];
-						repl = repl
-							+ "
+						repl += "
 						<tr>
 						<td>"
 							+ issue.number
@@ -160,6 +194,7 @@ class Server {
 
 					trace(repl);
 
+					replaced = replaced.replace("${isumpage " + isumpage + "}", "");
 					replaced = replaced.replace(keys, repl);
 				}
 				req.replyData(replaced, "text/html", 200);

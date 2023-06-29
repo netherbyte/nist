@@ -30,9 +30,12 @@ class Database {
 			}
 		}
 		var issues = [];
-		for (i in 1...issuesCount) {
+		trace(issuesCount);
+		for (i in 1...(issuesCount + 1)) {
+			trace(Path.join([Sys.getCwd(), "db/" + project, i + ".json"]));
 			var file:Issue = Json.parse(File.getContent(Path.join([Sys.getCwd(), "db/" + project, i + ".json"])));
 			issues.push(file);
+			trace(issues.length);
 		}
 		trace(issues);
 		return issues;
