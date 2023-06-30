@@ -41,37 +41,52 @@ class Server {
 		var fspath = Path.join([Sys.getCwd(), "/public/" + path]);
 
 		if (path == "issue.hx") {
+			trace(req.postData);
 			var data = req.postData.split("&");
 
 			var issue:Issue = {
 				number: "",
 				assignees: [],
-				reporter: "",
+				reporter: "iguana",
 				status: "Open",
 				versionsAffected: [],
 				updates: [[]],
-				createdOn: Math.round(Date.now().getTime()),
+				createdOn: Math.round(Sys.time()),
 				description: "",
 				name: ""
 			};
 
+			var project = params[0].substr(8);
+			var pid = "";
+
 			for (d in data) {
 				var kv = d.split("=");
-				switch(kv[0]) {
-					case "name":
+				trace(kv);
+				switch (kv[0]) {
+					case "\nname":
 						issue.name = kv[1];
+						trace(issue.name);
 					case "desc":
 						issue.description = kv[1];
+						trace("here");
 					case "1":
 						issue.versionsAffected.push("a1.0.0");
+						trace("here");
 					case "2":
 						issue.versionsAffected.push("a1.1.0");
+						trace("here");
 				}
 			}
 
-			Database.addIssue(issue);
+			switch (project) {
+				case "Microfacture":
+					pid = "MF";
+			}
 
-			req.close();
+			Database.addIssue(issue, project, pid);
+
+			req.replyData("Issue Reported", "text/plain", 200);
+			return;
 		}
 
 		if (FileSystem.exists(fspath) && !FileSystem.isDirectory(fspath)) {
@@ -175,26 +190,26 @@ class Server {
 					var keys = "${" + isumpage + "_issuecTR}";
 
 					var issues = Database.getIssues(isumpage);
-					issues.sort((a, b) -> Std.parseInt(a.number.substring(3)) - Std.parseInt(b.number.substring(3)));
+					issues.sort((a, b) -> Std.parseInt(b.number.substring(3)) - Std.parseInt(a.number.substring(3)));
 					for (i in 0...(issues.length)) {
 						var issue = issues[i];
 						repl += "
-						<tr>
-						<td>"
+						<tr><td><a href=\"?issue="
+							+ issue.number.substr(3)
+							+ "\">
+						"
 							+ issue.number
 							+ "</td>
-						<td>"
+						</a><td>"
 							+ issue.name
 							+ "</td>
 							<td>"
 							+ issue.status
 							+ "</td>
-						";
+						</tr>";
 					}
 
-					trace(repl);
-
-					replaced = replaced.replace("${isumpage " + isumpage + "}", "");
+					replaced = replaced.replace("${isumpage \"" + isumpage + "\"}", "");
 					replaced = replaced.replace(keys, repl);
 				}
 				req.replyData(replaced, "text/html", 200);
