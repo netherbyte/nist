@@ -51,7 +51,7 @@ class Server {
 				status: "Open",
 				versionsAffected: [],
 				updates: [[]],
-				createdOn: Math.round(Sys.time()),
+				createdOn: Sys.time(),
 				description: "",
 				name: ""
 			};
@@ -137,7 +137,7 @@ class Server {
 							"issue.lastUpdate",
 							"issue.reporter"
 						];
-						var created = Date.fromTime(issue.createdOn);
+						var created = Date.fromTime(issue.createdOn * 1000);
 						var irv = [issue.number,
 							issue.name,
 							issue.status,
@@ -145,7 +145,7 @@ class Server {
 							issue.versionsAffected.toString(),
 							created.getFullYear()
 							+ "-"
-							+ created.getMonth()
+							+ (created.getMonth() + 1)
 							+ "-"
 							+ created.getDate()
 							+ " "
