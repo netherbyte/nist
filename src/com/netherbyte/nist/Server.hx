@@ -137,13 +137,21 @@ class Server {
 							"issue.lastUpdate",
 							"issue.reporter"
 						];
-						var irv = [
-							issue.number,
+						var created = Date.fromTime(issue.createdOn);
+						var irv = [issue.number,
 							issue.name,
 							issue.status,
 							issue.description,
 							issue.versionsAffected.toString(),
-							issue.createdOn + "",
+							created.getFullYear()
+							+ "-"
+							+ created.getMonth()
+							+ "-"
+							+ created.getDate()
+							+ " "
+							+ created.getHours()
+							+ ":"
+							+ created.getMinutes(),
 							issue.updates[issue.updates.length - 1][1],
 							issue.reporter
 						];
