@@ -1,5 +1,6 @@
 package com.netherbyte.nist;
 
+import com.netherbyte.nist.sitehandlers.LoginUser;
 import haxe.ds.ArraySort;
 import haxe.Log;
 import haxe.Json;
@@ -21,12 +22,12 @@ class Server {
 		replacementsV.push(value);
 	}
 
-	public static function create() {
+	public static function start(host:String) {
 		if (Sys.args().contains("--dev")) {
-			server = new HTTPServer("0.0.0.0", 3000, true);
+			server = new HTTPServer(host, 3000, true);
 			Sys.println("Listening on port 3000");
 		} else {
-			server = new HTTPServer("0.0.0.0", 443, true);
+			server = new HTTPServer(host, 443, true);
 			Sys.println("Listening on port 443");
 		}
 		server.onClientConnect = (d:HTTPRequest) -> handleRequest(d);
@@ -41,51 +42,11 @@ class Server {
 		var fspath = Path.join([Sys.getCwd(), "/public/" + path]);
 
 		if (path == "issue.hx") {
-			trace(req.postData);
-			var data = req.postData.split("&");
-
-			var issue:Issue = {
-				number: "",
-				assignees: [],
-				reporter: "iguana",
-				status: "Open",
-				versionsAffected: [],
-				updates: [[]],
-				createdOn: Sys.time(),
-				description: "",
-				name: ""
-			};
-
-			var project = params[0].substr(8);
-			var pid = "";
-
-			for (d in data) {
-				var kv = d.split("=");
-				trace(kv);
-				switch (kv[0]) {
-					case "\nname":
-						issue.name = kv[1];
-						trace(issue.name);
-					case "desc":
-						issue.description = kv[1];
-						trace("here");
-					case "1":
-						issue.versionsAffected.push("a1.0.0");
-						trace("here");
-					case "2":
-						issue.versionsAffected.push("a1.1.0");
-						trace("here");
-				}
-			}
-
-			switch (project) {
-				case "Microfacture":
-					pid = "MF";
-			}
-
-			Database.addIssue(issue, project, pid);
-
-			req.replyData("Issue Reported", "text/plain", 200);
+			com.netherbyte.nist.sitehandlers.Issue.execute(req, path, params);
+			return;
+		}
+		if (path == "account/login_user.hx") {
+			LoginUser.execute(req, path, params);
 			return;
 		}
 

@@ -10,6 +10,6 @@ class Main {
 		// the header is gonna be a back button or something
 		// i can make it read from an html file
 		Sys.println("Creating HTTP server");
-		Server.create();
+		Server.start("0.0.0.0");
 	}
 }

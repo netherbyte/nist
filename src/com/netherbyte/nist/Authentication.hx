@@ -9,4 +9,8 @@ class Authentication {
 		var usrBytes = Bytes.ofString(username);
 		Database.append(Bytes.ofHex(usrBytes.toHex() + "0A" + pwdHash.toHex()), 1);
 	}
+
+	public static function verifyUser(username:String, password:String):Bool {
+		return false;
+	}
 }
